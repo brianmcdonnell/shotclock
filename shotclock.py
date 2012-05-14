@@ -26,7 +26,7 @@ def process_file(path, command):
 
     fulltype = mimetypes.guess_type(path)
     maintype, subtype = fulltype[0].split('/')
-    if (fulltype[0] == 'image/pjpeg'):
+    if (fulltype[0] == 'image/jpeg'):
         command.process_jpeg(path)
     elif (fulltype[0] == 'video/x-msvideo'):
         command.process_avi(path)
@@ -44,6 +44,8 @@ def process_expanded_arg(arg, command):
             p = os.path.join(arg, p)
             if os.path.isfile(p):
                 process_file(p, command)
+    else:
+        print "%s not found - skipping." % arg
 
 def main():
     ''' shotclock.py (timeshift|rename) [options] path1 path2... 
@@ -63,6 +65,7 @@ def main():
         print "  rename   \t\trename files from metadata"
         exit(1)
 
+    
     for arg in command.arguments:
         for expanded in glob.glob(arg):
             process_expanded_arg(expanded, command)
