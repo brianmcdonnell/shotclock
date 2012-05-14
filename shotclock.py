@@ -46,7 +46,7 @@ def process_expanded_arg(arg, command):
                 process_file(p, command)
 
 def main():
-    ''' canon.py (timeshift|rename) [options] path1 path2... 
+    ''' shotclock.py (timeshift|rename) [options] path1 path2... 
     '''
     import sys
     if sys.argv[1] == 'timeshift':
@@ -56,7 +56,7 @@ def main():
         from renamer import Renamer
         command = Renamer()
     else:
-        print "Canon Media Helper"
+        print "ShotClock photo/video organizer."
         print ""
         print "Commands:"
         print "  timeshift\t\ttranspose timestamps by specified amount"
