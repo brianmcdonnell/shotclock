@@ -14,12 +14,20 @@ Functionality
 Basic Usage
 -----------
 
-*   $ python shotclock.py rename [options] path  
-e.g.  
-python shotclock rename *.jpg
-*   $ python shotclock.py timeshift [options] path  
-e.g.  
-python shotclock timeshift --hours -4 *.jpg *.avi
+*   `$ python shotclock.py rename [options] path`  
+*   `$ python shotclock.py timeshift [options] path`  
+
+### Examples
+
+#### Adjust all AVIs and JPG metadata timestamps by -4 hours:
+`$ python shotclock.py timeshift --hours -4 *.jpg *.avi`
+
+#### Rename all JPGs by metadata timestamp:
+`$ python shotclock rename *.jpg`
+
+### Output
+
+Output is always sent to an `./output/` sub-directory.  Original files are not modified.
 
 
 Use Cases
