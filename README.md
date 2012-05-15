@@ -1,4 +1,4 @@
-shotclock
+ShotClock
 =========
 
 Organize photos and videos by date &amp; time taken.
@@ -9,6 +9,17 @@ Functionality
 
 *   Rename jpg and avi files by timestamp.
 *   Offset jpg and avi timestamps by any time interval.
+
+
+Basic Usage
+-----------
+
+*   $ python shotclock.py rename [options] path  
+e.g.  
+python shotclock rename *.jpg
+*   $ python shotclock.py timeshift [options] path  
+e.g.  
+python shotclock timeshift --hours -4 *.jpg *.avi
 
 
 Use Cases
