@@ -40,7 +40,7 @@ Use Cases
 
 Limitations
 -----------
-Only tested on Canon A710 and Canon A590 (but likely to work for most digital cameras).
+Only tested on Canon A710 and Canon A590 (but likely to work for JPGs and AVIs from most digital cameras).
 
 
 Requirements
