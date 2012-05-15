@@ -23,7 +23,7 @@ Basic Usage
 `$ python shotclock.py timeshift --hours -4 *.jpg *.avi`
 
 #### Rename all JPGs by metadata timestamp:
-`$ python shotclock rename *.jpg`
+`$ python shotclock.py rename *.jpg`
 
 ### Output
 
