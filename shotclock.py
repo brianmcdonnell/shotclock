@@ -1,7 +1,6 @@
-#!/usr/bin/env python
+#! /usr/bin/env python
+
 import os
-import glob
-import mimetypes
 
 def create_backup(input_path):
     dir_path, filename = os.path.split(input_path)
@@ -24,6 +23,7 @@ def process_file(path, command):
     # Backup the file before it's processed
     #create_backup(path)
 
+    import mimetypes
     fulltype = mimetypes.guess_type(path)
     maintype, subtype = fulltype[0].split('/')
     if (fulltype[0] == 'image/jpeg'):
@@ -48,24 +48,29 @@ def process_expanded_arg(arg, command):
         print "%s not found - skipping." % arg
 
 def main():
-    ''' shotclock.py (timeshift|rename) [options] path1 path2... 
-    '''
-    import sys
-    if sys.argv[1] == 'timeshift':
-        from timeshifter import TimeShifter
-        command = TimeShifter()
-    elif sys.argv[1] == 'rename':
-        from renamer import Renamer
-        command = Renamer()
-    else:
-        print "ShotClock photo/video organizer."
-        print ""
-        print "Commands:"
-        print "  timeshift\t\ttranspose timestamps by specified amount"
-        print "  rename   \t\trename files from metadata"
-        exit(1)
+    import argparse
+    parser = argparse.ArgumentParser()
+    subparsers = parser.add_subparsers(dest='subparser', help='sub-command help')
 
-    
+    timeshift_parser = subparsers.add_parser('timeshift', help='Timeshift matching files by the specified amount.')
+    timeshift_parser.add_argument('--hours', type=int, dest='hours', default=None)
+    timeshift_parser.add_argument('--minutes', '-m', type=int, dest='minutes', default=None)
+    timeshift_parser.add_argument('glob', nargs='+', help='Globs of files to process.')
+
+    from renamer import Renamer
+    renamer_parser = subparsers.add_parser('renamer', help='Rename matching files to their timestamp values.')
+    renamer_parser.add_argument('--format', '-f', default=Renamer.filename_format)
+    renamer_parser.add_argument('glob', nargs='+', help='Globs of files to process.')
+
+    args = parser.parse_args()
+
+    if args.parser == 'timeshift':
+        from timeshifter import TimeShifter
+        command = TimeShifter(args.hours, args.minutes)
+    elif args.parser == 'rename':
+        command = Renamer(args.filename_format)
+
+    import glob
     for arg in command.arguments:
         for expanded in glob.glob(arg):
             process_expanded_arg(expanded, command)

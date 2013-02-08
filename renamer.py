@@ -1,19 +1,12 @@
 from sys import stderr, exit
 
 class Renamer(object):
-    usage = "usage@ %prog rename [options] path"
     date_format = '%Y-%m-%d %H-%M-%S'
     filename_format = '%(date)s %(filename)s'
     output_dir = 'output'
 
-    def __init__(self):
-        import optparse
-        parser = optparse.OptionParser(Renamer.usage)
-        parser.add_option('--filename_format', '-f', dest='filename_format', default=Renamer.filename_format)
-        self.options, self.arguments = parser.parse_args()
-
-    def show_usage(self):
-        print Renamer.usage
+    def __init__(self, filename_format=None):
+        self.filename_format = filename_format or Renamer.filename_format
 
     def _get_output_path(self, input_path):
         import os
@@ -72,7 +65,7 @@ class Renamer(object):
         import os
         dir_path, filename = os.path.split(path)
         filename_trunc, filext = os.path.splitext(filename)
-        new_filename = self.options.filename_format % {'date': dt.strftime(Renamer.date_format), 'filename': filename_trunc}
+        new_filename = self.filename_format % {'date': dt.strftime(Renamer.date_format), 'filename': filename_trunc}
         if num:
             new_filename += ' %03d' % num
         new_filename += filext

@@ -2,21 +2,12 @@ from sys import stderr, exit
 import datetime
 
 class TimeShifter(object):
-    usage = "%prog timeshift [options] path"
     date_format = '%a %b %d %H:%M:%S %Y\n'
     output_dir = 'output'
 
-    def __init__(self):
-        import optparse
-        parser = optparse.OptionParser(TimeShifter.usage)
-        parser.add_option('--hours', '-H', dest='hours', default=None)
-        parser.add_option('--minutes', '-M', dest='minutes', default=None)
-        self.options, self.arguments = parser.parse_args()
-        if not self.options.hours and not self.options.minutes:
-            parser.error("Either 'hours' or 'minutes' must be specified")
-
-    def show_usage(self):
-        print TimeShifter.usage
+    def __init__(self, hours=0, minutes=0):
+        self.hours = hours
+        self.minutes = minutes
 
     def _get_output_path(self, input_path):
         import os
@@ -101,9 +92,7 @@ class TimeShifter(object):
         parser.stream._input.close()
 
     def _shift_time(self, input_time):
-        hrs = int(self.options.hours) if self.options.hours else 0
-        mins = int(self.options.minutes) if self.options.minutes else 0
-        td = datetime.timedelta(hours=hrs, minutes=mins)
+        td = datetime.timedelta(hours=self.hours, minutes=self.minutes)
         output_time = input_time + td
-        print "%s -> %s (h:%s m:%s)" % (input_time, output_time, hrs, mins)
+        print "%s -> %s (h:%s m:%s)" % (input_time, output_time, self.hours, self.minutes)
         return output_time
