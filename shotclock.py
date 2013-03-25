@@ -26,12 +26,14 @@ def process_file(path, command):
     import mimetypes
     fulltype = mimetypes.guess_type(path)
     maintype, subtype = fulltype[0].split('/')
-    if (fulltype[0] == 'image/jpeg'):
+    if fulltype[0] in ['image/jpeg', 'image/pjpeg']:
         command.process_jpeg(path)
-    elif (fulltype[0] == 'video/x-msvideo'):
+    elif fulltype[0] == 'video/x-msvideo':
         command.process_avi(path)
     elif maintype == "video":
         command.process_avi(path)
+    else:
+        raise Exception("Unknown filetype: %s" % fulltype[0])
 
 def process_expanded_arg(arg, command):
     ''' We want to process lists of file and directory arguments.
@@ -64,14 +66,16 @@ def main():
 
     args = parser.parse_args()
 
-    if args.parser == 'timeshift':
+    if args.subparser == 'timeshift':
         from timeshifter import TimeShifter
         command = TimeShifter(args.hours, args.minutes)
-    elif args.parser == 'rename':
-        command = Renamer(args.filename_format)
+    elif args.subparser == 'renamer':
+        command = Renamer(args.format)
+    else:
+        raise Exception("Unknown command")
 
     import glob
-    for arg in command.arguments:
+    for arg in args.glob:
         for expanded in glob.glob(arg):
             process_expanded_arg(expanded, command)
 
