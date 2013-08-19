@@ -80,5 +80,6 @@ def main():
             process_expanded_arg(expanded, command)
 
 if __name__ == '__main__':
+    print "ASD"
     main()
 
