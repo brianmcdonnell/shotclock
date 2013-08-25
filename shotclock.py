@@ -23,17 +23,21 @@ def process_file(path, command):
     # Backup the file before it's processed
     #create_backup(path)
 
-    import mimetypes
-    fulltype = mimetypes.guess_type(path)
-    maintype, subtype = fulltype[0].split('/')
-    if fulltype[0] in ['image/jpeg', 'image/pjpeg']:
-        command.process_jpeg(path)
-    elif fulltype[0] == 'video/x-msvideo':
-        command.process_avi(path)
-    elif maintype == "video":
-        command.process_avi(path)
-    else:
-        raise Exception("Unknown filetype: %s" % fulltype[0])
+    try:
+        import mimetypes
+        fulltype = mimetypes.guess_type(path)
+        maintype, subtype = fulltype[0].split('/')
+        if fulltype[0] in ['image/jpeg', 'image/pjpeg']:
+            command.process_jpeg(path)
+        elif fulltype[0] == 'video/x-msvideo':
+            command.process_avi(path)
+        elif maintype == "video":
+            command.process_avi(path)
+        else:
+            raise Exception("Unknown filetype: %s" % fulltype[0])
+    except Exception as e:
+        print "Skipping %s" % path
+        print e
 
 def process_expanded_arg(arg, command):
     ''' We want to process lists of file and directory arguments.
