@@ -34,7 +34,6 @@ virtualenv env
 source env/bin/activate
 success 'virtualenv activated'
 
-pip install -e bzr+lp:~adam.russell/pyexiv2/pyexiv2-0.3#egg=pyexiv2
 run "easy_install -Z hachoir-core"
 run "easy_install -Z hachoir-metadata"
 run "easy_install -Z hachoir-parser"
