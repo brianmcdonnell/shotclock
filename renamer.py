@@ -26,7 +26,23 @@ class Renamer(object):
         import pyexiv2
         metadata = pyexiv2.ImageMetadata(output_path)
         metadata.read()
-        dt = metadata['Exif.Image.DateTime'].value
+        dt_original = dt_digitized = dt = None
+        try:
+            dt_original = metadata['Exif.Photo.DateTimeOriginal'].value
+        except:
+            pass
+        try:
+            dt_digitized = metadata['Exif.Photo.DateTimeDigitized'].value
+        except:
+            pass
+        try:
+            dt = metadata['Exif.Image.DateTime'].value
+        except:
+            pass
+        #import pdb;pdb.set_trace()
+        dt = dt_original or dt_digitized or dt
+        if dt is None:
+            raise Exception("No suitable image datetime found.")
         self._rename_file(output_path, dt)
 
     def process_avi(self, input_path):
