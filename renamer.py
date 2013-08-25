@@ -2,6 +2,7 @@ from sys import stderr, exit
 
 class Renamer(object):
     date_format = '%Y-%m-%d %H-%M-%S'
+    date_compact_format = '%Y%m%d_%H%M%S'
     filename_format = '%(date)s %(filename)s'
     output_dir = 'output'
 
@@ -61,23 +62,25 @@ class Renamer(object):
         parser.stream._input.close()
         self._rename_file(output_path, creation_date)
 
-    def _make_output_path(self, path, dt, num=None):
+    def _make_output_path(self, path, dt):
         import os
         dir_path, filename = os.path.split(path)
         filename_trunc, filext = os.path.splitext(filename)
-        new_filename = self.filename_format % {'date': dt.strftime(Renamer.date_format), 'filename': filename_trunc}
-        if num:
-            new_filename += ' %03d' % num
+        date_str = dt.strftime(Renamer.date_format)
+        date_compact_str = dt.strftime(Renamer.date_compact_format)
+        new_filename = self.filename_format % {'date': date_str, 'date_compact': date_compact_str, 'filename': filename_trunc}
         new_filename += filext
         new_path = os.path.join(dir_path, new_filename)
         return new_path
 
     def _rename_file(self, input_path, dt):
         import os
-        output_path = self._make_output_path(input_path, dt, None)
-        num = 1
+        output_path = self._make_output_path(input_path, dt)
+        num = 0
         while os.path.exists(output_path):
+            filename_trunc, filext = os.path.splitext(output_path)
+            filename_trunc += '(%s)' % num
+            output_path = filename_trunc + filext
             num += 1
-            output_path = self._make_output_path(input_path, dt, num)
         os.rename(input_path, output_path)
         print '%s -> %s'% (input_path, output_path)
