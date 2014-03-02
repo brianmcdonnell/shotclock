@@ -40,10 +40,10 @@ class Renamer(object):
         except:
             pass
         #import pdb;pdb.set_trace()
-        dt = dt_original or dt_digitized or dt
-        if dt is None:
+        dt_list = filter(None, [dt_original, dt_digitized, dt])
+        if len(dt_list) == 0:
             raise Exception("No suitable image datetime found.")
-        self._rename_file(output_path, dt)
+        self._rename_file(output_path, min(dt_list))
 
     def process_avi(self, input_path):
         uoutput_path, output_path = self._get_output_path(input_path)
