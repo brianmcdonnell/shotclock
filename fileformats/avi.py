@@ -41,6 +41,5 @@ class AVIFile(BaseFile):
             self.editor.writeInto(output)
 
     def close(self):
-        # Close the file io stream
         self.parser.stream._input.close()
 

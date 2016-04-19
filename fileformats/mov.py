@@ -1,21 +1,21 @@
 from fileformats.base import BaseFile
 
-class AVIFile(BaseFile):
+class MOVFile(BaseFile):
     date_format = '%a %b %d %H:%M:%S %Y\n'
 
     def __init__(self, path):
-        super(AVIFile, self).__init__(path)
+        super(MOVFile, self).__init__(path)
         from hachoir_parser import createParser
         from hachoir_core.cmd_line import unicodeFilename
         self.upath = unicodeFilename(path)
-        self.parser = createParser(path, self.upath)
+        self.parser = createParser(self.upath)
         if not self.parser:
             raise Exception("Could not parse: %s" % path)
         self._new_date = None
 
     def get_date(self):
         from hachoir_metadata import extractMetadata
-        metadata = extractMetadata(parser)
+        metadata = extractMetadata(self.parser)
         creation_date = metadata.get('creation_date')
         return creation_date
 
@@ -37,5 +37,4 @@ class AVIFile(BaseFile):
             editor.writeInto(output)
 
     def close(self):
-        # Close the file io stream
-        parser.stream._input.close()
+        self.parser.stream._input.close()

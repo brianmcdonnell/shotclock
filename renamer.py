@@ -38,12 +38,13 @@ class Renamer(object):
             # Break once we find a filename that doesn't already exist
             if not os.path.exists(output_path):
                 break
+            num += 1
         # Rename the working copy to the new filename
         os.rename(working_path, output_path)
         print '%s -> %s'% (input_path, output_path)
 
     def _get_output_filename(self, input_filename, dt):
-        dir_path, filename = os.path.split(path)
+        dir_path, filename = os.path.split(input_filename)
         filename_trunc, filext = os.path.splitext(filename)
         # Format dates
         date_str = dt.strftime(Renamer.date_format)

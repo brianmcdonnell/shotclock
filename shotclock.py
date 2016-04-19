@@ -17,8 +17,8 @@ def process_file(path, command, output_dir):
         elif maintype == 'video':
             if fulltype[0] == 'video/quicktime':
                 fmtKlass = mov.MOVFile
-            elif fulltype[0] == 'video/x-msvideo' or
-                    maintype == 'video':
+            elif (fulltype[0] == 'video/x-msvideo' or
+                    maintype == 'video'):
                 fmtKlass = avi.AVIFile
             else:
                 raise Exception("Unknown filetype: %s" % fulltype)
@@ -26,14 +26,14 @@ def process_file(path, command, output_dir):
         command.process_file(path, fmtKlass, output_dir)
     except Exception as e:
         print "Skipping %s" % path
-        print e
 
 def process_expanded_arg(arg, command, output_dir):
     ''' We want to process lists of file and directory arguments.
         We don't want to recurse directories.
     '''
     # Ensure the output directory exists
-    os.makedirs(output_dir)
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
 
     if os.path.isfile(arg):
         process_file(arg, command, output_dir)

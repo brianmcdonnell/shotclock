@@ -17,5 +17,5 @@ class JPEGFile(BaseFile):
         self.metadata['Exif.Photo.DateTimeOriginal'].value = date
         self.metadata['Exif.Photo.DateTimeDigitized'].value = date
 
-    def save(self)
+    def save(self):
         self.metadata.write()
