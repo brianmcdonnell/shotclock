@@ -1,3 +1,5 @@
+import os
+import os.path
 from sys import stderr, exit
 import datetime
 

@@ -24,11 +24,11 @@ class AVIFile(BaseFile):
     def save(self):
         if self._new_date is not None:
             from hachoir_editor import createEditor
-            self.editor = createEditor(self.parser)
+            editor = createEditor(self.parser)
             headers_fieldset = editor['headers']
             datetime_fieldset = headers_fieldset['datetime']
 
-            shifted_time_str = date.strftime(TimeShifter.date_format).upper()
+            shifted_time_str = self._new_date.strftime(AVIFile.date_format).upper()
             shifted_time_str += '\0'
 
             # Modify the metadata fields
@@ -38,7 +38,7 @@ class AVIFile(BaseFile):
             # Write out the file
             from hachoir_core.stream import FileOutputStream
             output = FileOutputStream(self.upath, self.path)
-            self.editor.writeInto(output)
+            editor.writeInto(output)
 
     def close(self):
         self.parser.stream._input.close()
