@@ -9,7 +9,7 @@ class JPEGFile(BaseFile):
         self.metadata.read()
 
     def get_date(self):
-        dt = metadata['Exif.Image.DateTime'].value
+        dt = self.metadata['Exif.Image.DateTime'].value
         return dt
 
     def set_date(self, date):
