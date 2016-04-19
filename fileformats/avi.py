@@ -7,14 +7,14 @@ class AVIFile(BaseFile):
         from hachoir_parser import createParser
         from hachoir_core.cmd_line import unicodeFilename
         self.upath = unicodeFilename(path)
-        self.parser = createParser(path, self.upath)
+        self.parser = createParser(self.upath)
         if not self.parser:
             raise Exception("Could not parse: %s" % path)
         self._new_date = None
 
     def get_date(self):
         from hachoir_metadata import extractMetadata
-        metadata = extractMetadata(parser)
+        metadata = extractMetadata(self.parser)
         creation_date = metadata.get('creation_date')
         return creation_date
 
