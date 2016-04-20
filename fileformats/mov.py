@@ -30,10 +30,12 @@ class MOVFile(BaseFile):
             mvhd = mv['/atom[0]']['movie_hdr']
             # old_date = mvhd['creation_date'].value
             # Set new date in metadata
-            mvhd['creation_date'] = self._new_date
+            old_date = mvhd['creation_date'].value
+            mvhd['creation_date'].value = old_date#self._new_date
             # Write out the file
             from hachoir_core.stream import FileOutputStream
-            output = FileOutputStream(self.upath, self.path)
+            #output = FileOutputStream(self.upath, self.path)
+            output = FileOutputStream(u'/tmp/sample.mov')
             editor.writeInto(output)
 
     def close(self):
