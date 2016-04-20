@@ -1,6 +1,5 @@
 import os
 import os.path
-from sys import stderr, exit
 import datetime
 
 class TimeShifter(object):
@@ -20,6 +19,7 @@ class TimeShifter(object):
         filefmt = fmtKlass(output_path)
         dt = filefmt.get_date()
         shifted_dt = self._shift_time(dt)
+        print "%s: %s -> %s (h:%s m:%s)" % (input_filename, dt, shifted_dt, self.hours, self.minutes)
         # Update the output file
         filefmt.set_date(shifted_dt)
         filefmt.save()
@@ -28,5 +28,4 @@ class TimeShifter(object):
     def _shift_time(self, input_time):
         td = datetime.timedelta(hours=self.hours, minutes=self.minutes)
         output_time = input_time + td
-        print "%s -> %s (h:%s m:%s)" % (input_time, output_time, self.hours, self.minutes)
         return output_time
