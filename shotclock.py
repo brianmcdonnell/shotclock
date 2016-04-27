@@ -2,16 +2,20 @@
 
 import os
 
+from hachoir_core import config as HachoirConfig
+HachoirConfig.quiet = True
+
+
 def process_file(path, command, output_dir):
     try:
         import mimetypes
         fulltype = mimetypes.guess_type(path)
         maintype, subtype = fulltype[0].split('/')
 
-        from fileformats import jpeg, avi, mov
+        from fileformats import jpeg, jpeg2, avi, mov
         if maintype == 'image':
             if fulltype[0] in ['image/jpeg', 'image/pjpeg']:
-                fmtKlass = jpeg.JPEGFile
+                fmtKlass = jpeg2.JPEG2File
             else:
                 raise Exception("Unknown filetype: %s" % fulltype)
         elif maintype == 'video':
@@ -26,6 +30,7 @@ def process_file(path, command, output_dir):
         command.process_file(path, fmtKlass, output_dir)
     except Exception as e:
         print "Skipping %s" % path
+        raise
 
 def process_expanded_arg(arg, command, output_dir):
     ''' We want to process lists of file and directory arguments.
