@@ -1,6 +1,9 @@
+from datetime import datetime
 from fileformats.base import BaseFile
 
+
 class JPEG2File(BaseFile):
+    DATE_FORMAT = '%Y:%m:%d %H:%M:%S'
 
     def __init__(self, path):
         super(JPEG2File, self).__init__(path)
@@ -10,83 +13,54 @@ class JPEG2File(BaseFile):
         self.parser = createParser(self.upath)
         if not self.parser:
             raise Exception("Could not parse: %s" % path)
-        self._new_date = None
 
-        import pyexiv2
-        self.metadata = pyexiv2.ImageMetadata(path)
-        self.metadata.read()
-
-    def get_date(self):
-        from hachoir_metadata import extractMetadata
-        metadata = extractMetadata(self.parser)
-        print metadata
-        print ""
-        for k in self.metadata:
-            print k, self.metadata[k].value
-
-        print ""
-        print "--------------"
-
+        self._metadata = {}
+        for key in ('creation_date', 'camera_manufacturer', 'camera_model'):
+            self._metadata[key] = None
 
         if "exif/content" in self.parser:
             for ifd in self.parser.array("exif/content/ifd"):
                 for entry in ifd.array("entry"):
-                    self.processIfdEntry(ifd, entry)
+                    self._processIfdEntry(ifd, entry)
 
-        #from hachoir_parser.image.exif import ExifIFD
-        #content = self.parser['/exif/content']
-        #for ifd in content:
-        #    if not isinstance(ifd, ExifIFD):
-        #        continue
-        #    for entry in ifd.array("entry"):
-        #        self.processIfdEntry(ifd, entry)
+        # for k, v in self._metadata.items():
+        #     print k, v
 
-        creation_date = metadata.get('creation_date')
-        return creation_date
-
-    def processIfdEntry(self, ifd, entry):
+    def _processIfdEntry(self, ifd, entry):
         from hachoir_metadata.jpeg import JpegMetadata
         tag = entry["tag"].value
         if tag not in JpegMetadata.EXIF_KEY:
             return
-
         key = JpegMetadata.EXIF_KEY[tag]
-        # Read value
-        if "value" in entry:
-            value = entry["value"].value
-        else:
-            value = ifd["value_%s" % entry.name].value
 
-        if key != 'comment':
-            print entry.path, key + ':', value, type(value)
-        #print ifd, entry
+        if key in self._metadata:
+            if "value" in entry:
+                value_node = entry["value"]
+            else:
+                value_node = ifd["value_%s" % entry.name]
+            self._metadata[key] = [value_node.path, None]
 
-    def _rest_get_date(self):
-        print ""
-        print ifd
-        for x in ifd:
-            print type(x)
-            print '\t', x.name, x.path, x.description, x.value
-            try:
-                print '\t', 'TAG', x['tag'], x['tag'].value
-            except:
-                pass
-            #import pdb;pdb.set_trace()
-        creation_date = metadata.get('creation_date')
-        #dt = self.metadata['Exif.Image.DateTime'].value
-        #print creation_date
-        #print ""
-        #print self.metadata['Exif.Image.DateTime'].value
-        #print self.metadata['Exif.Photo.DateTimeOriginal'].value
-        #print self.metadata['Exif.Photo.DateTimeDigitized'].value
+    def get_date(self):
+        path, value = self._metadata['creation_date']
+        creation_date = datetime.strptime(self.parser[path].value,
+                                          JPEG2File.DATE_FORMAT)
         return creation_date
 
     def set_date(self, date):
-        pass
-        #self.metadata['Exif.Image.DateTime'].value = date
-        #self.metadata['Exif.Photo.DateTimeOriginal'].value = date
-        #self.metadata['Exif.Photo.DateTimeDigitized'].value = date
+        self._metadata['creation_date'][1] = date
 
     def save(self):
-        pass
-        #self.metadata.write()
+        date_changed = self._metadata['creation_date'][1] is not None
+        from hachoir_editor import createEditor
+        editor = createEditor(self.parser)
+
+        if date_changed:
+            path, new_date = self._metadata['creation_date']
+            node = editor[path]
+            new_date_str = new_date.strftime(JPEG2File.DATE_FORMAT) + '\0'
+            node.value = new_date_str
+
+        # Write out the file
+        from hachoir_core.stream import FileOutputStream
+        output = FileOutputStream(u'/tmp/sample.jpg')
+        editor.writeInto(output)
