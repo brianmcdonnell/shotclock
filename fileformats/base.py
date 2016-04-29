@@ -1,8 +1,5 @@
 class BaseFile(object):
 
-    def __init__(self, path):
-        self.path = path
-
     def get_date(self):
         pass
 
@@ -12,5 +9,5 @@ class BaseFile(object):
     def close(self):
         pass
 
-    def save(self):
+    def save_as(self, path):
         pass

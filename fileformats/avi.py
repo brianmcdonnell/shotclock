@@ -21,10 +21,11 @@ class AVIFile(BaseFile):
     def set_date(self, date):
         self._new_date = date
 
-    def save(self):
+    def save_as(self, path):
+        from hachoir_editor import createEditor
+        editor = createEditor(self.parser)
+
         if self._new_date is not None:
-            from hachoir_editor import createEditor
-            editor = createEditor(self.parser)
             headers_fieldset = editor['headers']
             datetime_fieldset = headers_fieldset['datetime']
 
@@ -35,10 +36,10 @@ class AVIFile(BaseFile):
             datetime_fieldset['text'].value = shifted_time_str
             datetime_fieldset['size'].value = len(shifted_time_str)
 
-            # Write out the file
-            from hachoir_core.stream import FileOutputStream
-            output = FileOutputStream(self.upath, self.path)
-            editor.writeInto(output)
+        # Write out the file
+        from hachoir_core.stream import FileOutputStream
+        output = FileOutputStream(path)
+        editor.writeInto(output)
 
     def close(self):
         self.parser.stream._input.close()

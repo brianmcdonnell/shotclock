@@ -13,14 +13,14 @@ class JPEG2File(BaseFile):
         0x9003: "original_datetime",
         0x9004: "digitized_datetime"
     }
-    EXIF_TAG_NAMES = {v:k for k, v in EXIF_TAG_CODES.items()}
+    EXIF_TAG_NAMES = {v: k for k, v in EXIF_TAG_CODES.items()}
 
     def __init__(self, path):
         super(JPEG2File, self).__init__(path)
         from hachoir_parser import createParser
         from hachoir_core.cmd_line import unicodeFilename
-        self.upath = unicodeFilename(path)
-        self.parser = createParser(self.upath)
+        path = unicodeFilename(path)
+        self.parser = createParser(path)
         if not self.parser:
             raise Exception("Could not parse: %s" % path)
 
@@ -32,9 +32,7 @@ class JPEG2File(BaseFile):
                     self._processIfdEntry(ifd, entry)
 
     def _processIfdEntry(self, ifd, entry):
-        from hachoir_metadata.jpeg import JpegMetadata
         tag = entry["tag"].value
-
         if tag not in JPEG2File.EXIF_TAG_CODES:
             return
         print "TAG FOUND", hex(tag)
@@ -55,7 +53,7 @@ class JPEG2File(BaseFile):
     def set_date(self, date):
         self._metadata['creation_datetime'][1] = date
 
-    def save(self):
+    def save_as(self, path):
         date_changed = self._metadata['creation_datetime'][1] is not None
         from hachoir_editor import createEditor
         editor = createEditor(self.parser)
@@ -66,10 +64,13 @@ class JPEG2File(BaseFile):
             for key in ('creation_datetime',
                         'original_datetime',
                         'digitized_datetime'):
-                path  = self._metadata[key][0]
+                path = self._metadata[key][0]
                 editor[path].value = new_date_str
 
         # Write out the file
         from hachoir_core.stream import FileOutputStream
-        output = FileOutputStream(u'/tmp/sample.jpg')
+        output = FileOutputStream(path)
         editor.writeInto(output)
+
+    def close(self):
+        self.parser.stream._input.close()
