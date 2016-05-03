@@ -32,8 +32,9 @@ class MOVFile(BaseFile):
             mvhd = mv['/atom[0]']['movie_hdr']
             # old_date = mvhd['creation_date'].value
             # Set new date in metadata
-            old_date = mvhd['creation_date'].value
-            mvhd['creation_date'].value = old_date
+            # old_date = mvhd['creation_date'].value
+            # mvhd['creation_date'].value = old_date
+            mvhd['creation_date'].value = self._new_date
             # self._new_date
 
         # Write out the file
