@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 
 import os
+import os.path
 
 from hachoir_core import config as HachoirConfig
 HachoirConfig.quiet = True
@@ -8,29 +9,24 @@ HachoirConfig.quiet = True
 
 def process_file(path, command, output_dir):
     try:
-        import mimetypes
-        fulltype = mimetypes.guess_type(path)
-        maintype, subtype = fulltype[0].split('/')
+        base, ext = os.path.splitext(path)
+        ext = ext[1:].lower()
 
-        from fileformats import jpeg, jpeg2, avi, mov
-        if maintype == 'image':
-            if fulltype[0] in ['image/jpeg', 'image/pjpeg']:
-                fmtKlass = jpeg2.JPEG2File
-            else:
-                raise Exception("Unknown filetype: %s" % fulltype)
-        elif maintype == 'video':
-            if fulltype[0] == 'video/quicktime':
-                fmtKlass = mov.MOVFile
-            elif (fulltype[0] == 'video/x-msvideo' or
-                    maintype == 'video'):
-                fmtKlass = avi.AVIFile
-            else:
-                raise Exception("Unknown filetype: %s" % fulltype)
+        from fileformats import jpeg2, mov, avi
+        if ext in ['jpg', 'jpeg']:
+            fmtKlass = jpeg2.JPEG2File
+        elif ext == 'mov':
+            fmtKlass = mov.MOVFile
+        elif ext == 'avi':
+            fmtKlass = avi.AVIFile
+        else:
+            raise Exception("Unknown file extension: %s" % ext)
 
         command.process_file(path, fmtKlass, output_dir)
-    except Exception as e:
+    except Exception:
         print "Skipping %s" % path
         raise
+
 
 def process_expanded_arg(arg, command, output_dir):
     ''' We want to process lists of file and directory arguments.
@@ -54,18 +50,28 @@ if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('--output-dir', dest='output_dir', default='output')
-    subparsers = parser.add_subparsers(dest='subparser', help='sub-command help')
+    subparsers = parser.add_subparsers(dest='subparser',
+                                       help='sub-command help')
 
-    timeshift_parser = subparsers.add_parser('timeshift', help='Timeshift matching files by the specified amount.')
+    timeshift_parser = subparsers.add_parser('timeshift',
+                                             help='Timeshift matching files \
+                                             by the specified amount.')
     timeshift_parser.add_argument('--hours', type=int, dest='hours', default=0)
-    timeshift_parser.add_argument('--minutes', '-m', type=int, dest='minutes', default=0)
-    timeshift_parser.add_argument('glob', nargs='+', help='Globs of files to process.')
+    timeshift_parser.add_argument('--minutes', '-m',
+                                  type=int, dest='minutes', default=0)
+    timeshift_parser.add_argument('glob', nargs='+',
+                                  help='Globs of files to process.')
 
     from renamer import Renamer
-    renamer_parser = subparsers.add_parser('renamer', help='Rename matching files to their timestamp values.')
+    renamer_parser = subparsers.add_parser('renamer',
+                                           help='Rename matching files to \
+                                           their timestamp values.')
     renamer_parser.add_argument('--suffix', '-s', dest='suffix', default=None)
-    renamer_parser.add_argument('glob', nargs='+', help='Globs of files to process.')
-    renamer_parser.add_argument('--exclude-original-name', '-e', dest='exclude_original_name', action='store_true', default=False)
+    renamer_parser.add_argument('glob', nargs='+',
+                                help='Globs of files to process.')
+    renamer_parser.add_argument('--exclude-original-name', '-e',
+                                dest='exclude_original_name',
+                                action='store_true', default=False)
 
     args = parser.parse_args()
 
@@ -78,7 +84,6 @@ if __name__ == '__main__':
         raise Exception("Unknown command")
 
     import glob
-    import os.path
     for arg in args.glob:
         for expanded in glob.glob(arg):
             if os.path.abspath(args.output_dir):
@@ -91,4 +96,3 @@ if __name__ == '__main__':
                 output_dir = os.path.join(expanded_dirname, args.output_dir)
             output_dir = os.path.normpath(os.path.abspath(output_dir))
             process_expanded_arg(expanded, command, output_dir)
-
