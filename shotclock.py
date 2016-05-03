@@ -12,9 +12,9 @@ def process_file(path, command, output_dir):
         base, ext = os.path.splitext(path)
         ext = ext[1:].lower()
 
-        from fileformats import jpeg2, mov, avi
+        from fileformats import jpeg, mov, avi
         if ext in ['jpg', 'jpeg']:
-            fmtKlass = jpeg2.JPEG2File
+            fmtKlass = jpeg.JPEGFile
         elif ext == 'mov':
             fmtKlass = mov.MOVFile
         elif ext == 'avi':
