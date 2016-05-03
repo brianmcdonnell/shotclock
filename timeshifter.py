@@ -4,7 +4,6 @@ import datetime
 
 
 class TimeShifter(object):
-    date_format = '%a %b %d %H:%M:%S %Y\n'
 
     def __init__(self, hours=0, minutes=0):
         self.hours = hours
