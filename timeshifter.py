@@ -19,7 +19,7 @@ class TimeShifter(object):
         _, input_filename = os.path.split(input_path)
         output_path = os.path.join(output_dir, input_filename)
         filefmt.set_date(shifted_dt)
-        filefmt.save_as(output_path)
+        filefmt.save_as(unicode(output_path))
         filefmt.close()
 
         print "%s: %s -> %s (h:%s m:%s)" % \

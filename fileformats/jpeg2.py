@@ -44,8 +44,8 @@ class JPEG2File(BaseFile):
         self._metadata[key] = [value_node.path, None]
 
     def get_date(self):
-        path, value = self._metadata['creation_datetime']
-        creation_date = datetime.strptime(self.parser[path].value,
+        exif_path, value = self._metadata['creation_datetime']
+        creation_date = datetime.strptime(self.parser[exif_path].value,
                                           JPEG2File.DATE_FORMAT)
         return creation_date
 
@@ -63,8 +63,8 @@ class JPEG2File(BaseFile):
             for key in ('creation_datetime',
                         'original_datetime',
                         'digitized_datetime'):
-                path = self._metadata[key][0]
-                editor[path].value = new_date_str
+                exif_path = self._metadata[key][0]
+                editor[exif_path].value = new_date_str
 
         # Write out the file
         from hachoir_core.stream import FileOutputStream
