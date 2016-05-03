@@ -46,7 +46,7 @@ class Renamer(object):
         new_filename += filext
         return new_filename
 
-    def _get_unique_filename(output_dir, filename):
+    def _get_unique_filename(self, output_dir, filename):
         # Add numeric suffix to avoid name clashes
         filename_trunc, file_ext = os.path.splitext(filename)
         num = 1
@@ -55,8 +55,8 @@ class Renamer(object):
                 output_filename = filename
                 output_path = os.path.join(output_dir, output_filename)
             else:
-                filename_trunc += '(%s)' % num
-                output_filename = filename_trunc + file_ext
+                output_filename = filename_trunc + '(%s)' % num
+                output_filename += file_ext
                 output_path = os.path.join(output_dir, output_filename)
             # Break once we find a filename that doesn't already exist
             if not os.path.exists(output_path):
