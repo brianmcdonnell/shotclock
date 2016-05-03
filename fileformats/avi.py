@@ -3,7 +3,7 @@ from fileformats.base import BaseFile
 class AVIFile(BaseFile):
     date_format = '%a %b %d %H:%M:%S %Y\n'
     def __init__(self, path):
-        super(AVIFile, self).__init__(path)
+        super(AVIFile, self).__init__()
         from hachoir_parser import createParser
         from hachoir_core.cmd_line import unicodeFilename
         self.upath = unicodeFilename(path)

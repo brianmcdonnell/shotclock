@@ -16,7 +16,7 @@ class JPEG2File(BaseFile):
     EXIF_TAG_NAMES = {v: k for k, v in EXIF_TAG_CODES.items()}
 
     def __init__(self, path):
-        super(JPEG2File, self).__init__(path)
+        super(JPEG2File, self).__init__()
         from hachoir_parser import createParser
         from hachoir_core.cmd_line import unicodeFilename
         path = unicodeFilename(path)
@@ -35,7 +35,6 @@ class JPEG2File(BaseFile):
         tag = entry["tag"].value
         if tag not in JPEG2File.EXIF_TAG_CODES:
             return
-        print "TAG FOUND", hex(tag)
 
         key = JPEG2File.EXIF_TAG_CODES[tag]
         if "value" in entry:

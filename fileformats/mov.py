@@ -5,7 +5,7 @@ class MOVFile(BaseFile):
     date_format = '%a %b %d %H:%M:%S %Y\n'
 
     def __init__(self, path):
-        super(MOVFile, self).__init__(path)
+        super(MOVFile, self).__init__()
         from hachoir_parser import createParser
         from hachoir_core.cmd_line import unicodeFilename
         path = unicodeFilename(path)

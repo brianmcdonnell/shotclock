@@ -3,7 +3,7 @@ from fileformats.base import BaseFile
 class JPEGFile(BaseFile):
 
     def __init__(self, path):
-        super(JPEGFile, self).__init__(path)
+        super(JPEGFile, self).__init__()
         import pyexiv2
         self.metadata = pyexiv2.ImageMetadata(path)
         self.metadata.read()
