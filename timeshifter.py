@@ -11,16 +11,14 @@ class TimeShifter(object):
         self.minutes = minutes
 
     def process_file(self, input_path, fmtKlass, output_dir):
-        # Copy the original to the output directory (only work on copy)
-        _, input_filename = os.path.split(input_path)
-        output_path = os.path.join(output_dir, input_filename)
-
         # Get the creation date and shift it
         filefmt = fmtKlass(input_path)
         dt = filefmt.get_date()
         shifted_dt = self._shift_time(dt)
 
-        # Update the output file
+        # Update the metadata and persist to output path
+        _, input_filename = os.path.split(input_path)
+        output_path = os.path.join(output_dir, input_filename)
         filefmt.set_date(shifted_dt)
         filefmt.save_as(output_path)
         filefmt.close()
