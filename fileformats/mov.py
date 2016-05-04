@@ -13,12 +13,11 @@ class MOVFile(BaseFile):
         if not self.parser:
             raise Exception("Could not parse: %s" % path)
         self._new_date = None
-        self.inspect()
+        self._date_paths = self._find_date_paths()
 
     def get_date(self):
-        from hachoir_metadata import extractMetadata
-        metadata = extractMetadata(self.parser)
-        creation_date = metadata.get('creation_date')
+        path = self._date_paths['creation_date']
+        creation_date = self.parser[path].value
         return creation_date
 
     def set_date(self, date):
@@ -29,14 +28,10 @@ class MOVFile(BaseFile):
         editor = createEditor(self.parser)
 
         if self._new_date is not None:
-            mv = editor['/atom[2]']['movie']
-            mvhd = mv['/atom[0]']['movie_hdr']
-            # old_date = mvhd['creation_date'].value
-            # Set new date in metadata
-            # old_date = mvhd['creation_date'].value
-            # mvhd['creation_date'].value = old_date
-            mvhd['creation_date'].value = self._new_date
-            # self._new_date
+            for field_name, exif_path in self._date_paths.iteritems():
+                field = editor[exif_path]
+                field.value = self._new_date
+                print exif_path, field.value
 
         # Write out the file
         from hachoir_core.stream import FileOutputStream
@@ -45,31 +40,33 @@ class MOVFile(BaseFile):
 
     def _find_atom_by_field(self, node, field_name):
         for atom in node.array('atom'):
-            print [x for x in atom._fields.iterkeys()]
+            # print [x for x in atom._fields.iterkeys()]
             if field_name in atom:
                  # print "Found:", field_name
                 return atom[field_name]
         # print "Not found:", field_name
         return None
 
-    def inspect(self):
+    def _find_date_paths(self):
+        paths = {}
+
         movie = self._find_atom_by_field(self.parser, 'movie')
         movie_hdr = self._find_atom_by_field(movie, 'movie_hdr')
         # import pdb;pdb.set_trace()
-        print movie_hdr['creation_date']
-        print movie_hdr['lastmod_date']
+        paths['creation_date'] = movie_hdr['creation_date'].path
+        paths['modified_date'] = movie_hdr['lastmod_date'].path
 
-        print "--- track ---"
         track = self._find_atom_by_field(movie, 'track')
         track_hdr = self._find_atom_by_field(track, 'track_hdr')
-        print track_hdr['creation_date']
-        print track_hdr['lastmod_date']
+        paths['track_creation_date'] = track_hdr['creation_date'].path
+        paths['track_modified_date'] = track_hdr['lastmod_date'].path
 
-        print "--- media ---"
         media = self._find_atom_by_field(track, 'media')
         media_hdr = self._find_atom_by_field(media, 'media_hdr')
-        print media_hdr['creation_date']
-        print media_hdr['lastmod_date']
+        paths['media_creation_date'] = media_hdr['creation_date'].path
+        paths['media_modified_date'] = media_hdr['lastmod_date'].path
+
+        return paths
 
     def close(self):
         self.parser.stream._input.close()
