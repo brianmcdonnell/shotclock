@@ -4,7 +4,7 @@ from datetime import datetime
 
 
 class AVIFile(BaseFile):
-    date_format = '%a %b %d %H:%M:%S %Y\n'
+    DATE_FORMAT = '%a %b %d %H:%M:%S %Y\n'
 
     def __init__(self, path):
         super(AVIFile, self).__init__()
@@ -19,7 +19,7 @@ class AVIFile(BaseFile):
     def get_date(self):
         date_field = self.parser[self._date_path]
         creation_date = datetime.strptime(date_field.value,
-                                          AVIFile.date_format)
+                                          AVIFile.DATE_FORMAT)
         return creation_date
 
     def set_date(self, date):
@@ -30,7 +30,7 @@ class AVIFile(BaseFile):
         editor = createEditor(self.parser)
 
         if self._new_date is not None:
-            new_date_str = self._new_date.strftime(AVIFile.date_format)
+            new_date_str = self._new_date.strftime(AVIFile.DATE_FORMAT)
             new_date_str = new_date_str.upper() + '\0'
 
             # Modify the metadata fields
