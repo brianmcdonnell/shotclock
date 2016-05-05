@@ -1,21 +1,25 @@
 from fileformats.base import BaseFile
 
+from datetime import datetime
+
+
 class AVIFile(BaseFile):
     date_format = '%a %b %d %H:%M:%S %Y\n'
+
     def __init__(self, path):
         super(AVIFile, self).__init__()
         from hachoir_parser import createParser
-        from hachoir_core.cmd_line import unicodeFilename
-        self.upath = unicodeFilename(path)
-        self.parser = createParser(self.upath)
+        self.parser = createParser(unicode(path))
         if not self.parser:
             raise Exception("Could not parse: %s" % path)
+
+        self._date_path = '/headers/datetime/text'
         self._new_date = None
 
     def get_date(self):
-        from hachoir_metadata import extractMetadata
-        metadata = extractMetadata(self.parser)
-        creation_date = metadata.get('creation_date')
+        date_field = self.parser[self._date_path]
+        creation_date = datetime.strptime(date_field.value,
+                                          AVIFile.date_format)
         return creation_date
 
     def set_date(self, date):
@@ -26,15 +30,12 @@ class AVIFile(BaseFile):
         editor = createEditor(self.parser)
 
         if self._new_date is not None:
-            headers_fieldset = editor['headers']
-            datetime_fieldset = headers_fieldset['datetime']
-
-            shifted_time_str = self._new_date.strftime(AVIFile.date_format).upper()
-            shifted_time_str += '\0'
+            new_date_str = self._new_date.strftime(AVIFile.date_format)
+            new_date_str = new_date_str.upper() + '\0'
 
             # Modify the metadata fields
-            datetime_fieldset['text'].value = shifted_time_str
-            datetime_fieldset['size'].value = len(shifted_time_str)
+            date_field = editor[self._date_path]
+            date_field.value = new_date_str
 
         # Write out the file
         from hachoir_core.stream import FileOutputStream
@@ -43,4 +44,3 @@ class AVIFile(BaseFile):
 
     def close(self):
         self.parser.stream._input.close()
-
