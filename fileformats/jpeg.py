@@ -1,5 +1,6 @@
-from datetime import datetime
 from fileformats.base import BaseFile
+
+from datetime import datetime
 
 
 class JPEGFile(BaseFile):
@@ -13,19 +14,18 @@ class JPEGFile(BaseFile):
         0x9003: "original_datetime",
         0x9004: "digitized_datetime"
     }
-    EXIF_TAG_NAMES = {v: k for k, v in EXIF_TAG_CODES.items()}
 
     def __init__(self, path):
         super(JPEGFile, self).__init__()
         from hachoir_parser import createParser
-        from hachoir_core.cmd_line import unicodeFilename
-        path = unicodeFilename(path)
-        self.parser = createParser(path)
+        self.parser = createParser(unicode(path))
         if not self.parser:
             raise Exception("Could not parse: %s" % path)
 
-        self._metadata = {}
+        self._new_date = None
+        self._metadata_paths = {}
 
+        # Search ifd fields for metadata
         if "exif/content" in self.parser:
             for ifd in self.parser.array("exif/content/ifd"):
                 for entry in ifd.array("entry"):
@@ -41,29 +41,27 @@ class JPEGFile(BaseFile):
             value_node = entry["value"]
         else:
             value_node = ifd["value_%s" % entry.name]
-        self._metadata[key] = [value_node.path, None]
+        self._metadata_paths[key] = value_node.path
 
     def get_date(self):
-        exif_path, value = self._metadata['creation_datetime']
+        exif_path = self._metadata_paths['creation_datetime']
         creation_date = datetime.strptime(self.parser[exif_path].value,
                                           JPEGFile.DATE_FORMAT)
         return creation_date
 
     def set_date(self, date):
-        self._metadata['creation_datetime'][1] = date
+        self._new_date = date
 
     def save_as(self, path):
-        date_changed = self._metadata['creation_datetime'][1] is not None
         from hachoir_editor import createEditor
         editor = createEditor(self.parser)
 
-        if date_changed:
-            new_date = self._metadata['creation_datetime'][1]
-            new_date_str = new_date.strftime(JPEGFile.DATE_FORMAT) + '\0'
+        if self._new_date is not None:
+            new_date_str = self._new_date.strftime(JPEGFile.DATE_FORMAT) + '\0'
             for key in ('creation_datetime',
                         'original_datetime',
                         'digitized_datetime'):
-                exif_path = self._metadata[key][0]
+                exif_path = self._metadata_paths[key]
                 editor[exif_path].value = new_date_str
 
         # Write out the file
