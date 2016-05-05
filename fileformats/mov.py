@@ -39,32 +39,45 @@ class MOVFile(BaseFile):
         editor.writeInto(output)
 
     def _find_atom_by_field(self, node, field_name):
+        found = []
         for atom in node.array('atom'):
             # print [x for x in atom._fields.iterkeys()]
             if field_name in atom:
                  # print "Found:", field_name
-                return atom[field_name]
+                found.append(atom[field_name])
+
         # print "Not found:", field_name
+        if found:
+            print field_name, len(found)
+            return found
         return None
 
     def _find_date_paths(self):
         paths = {}
 
-        movie = self._find_atom_by_field(self.parser, 'movie')
-        movie_hdr = self._find_atom_by_field(movie, 'movie_hdr')
+        movie = self._find_atom_by_field(self.parser, 'movie')[0]
+        movie_hdr = self._find_atom_by_field(movie, 'movie_hdr')[0]
         # import pdb;pdb.set_trace()
         paths['creation_date'] = movie_hdr['creation_date'].path
         paths['modified_date'] = movie_hdr['lastmod_date'].path
 
-        track = self._find_atom_by_field(movie, 'track')
-        track_hdr = self._find_atom_by_field(track, 'track_hdr')
-        paths['track_creation_date'] = track_hdr['creation_date'].path
-        paths['track_modified_date'] = track_hdr['lastmod_date'].path
+        tracks = self._find_atom_by_field(movie, 'track')
+        for track in tracks:
+            track_hdr = self._find_atom_by_field(track, 'track_hdr')[0]
+            paths['track_creation_date'] = track_hdr['creation_date'].path
+            paths['track_modified_date'] = track_hdr['lastmod_date'].path
 
-        media = self._find_atom_by_field(track, 'media')
-        media_hdr = self._find_atom_by_field(media, 'media_hdr')
-        paths['media_creation_date'] = media_hdr['creation_date'].path
-        paths['media_modified_date'] = media_hdr['lastmod_date'].path
+            media = self._find_atom_by_field(track, 'media')[0]
+            media_hdr = self._find_atom_by_field(media, 'media_hdr')[0]
+            paths['media_creation_date'] = media_hdr['creation_date'].path
+            paths['media_modified_date'] = media_hdr['lastmod_date'].path
+
+        print "   "
+
+        for field_name, exif_path in paths.iteritems():
+            field = self.parser[exif_path]
+            print "INSPECT", exif_path, field.value
+
 
         return paths
 
