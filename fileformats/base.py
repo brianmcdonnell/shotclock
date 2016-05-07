@@ -8,7 +8,7 @@ class HachoirParsable(object):
             raise Exception("Could not parse: %s" % path)
 
     def __enter__(self):
-        return self.parser
+        return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.parser.stream._input.close()
