@@ -1,15 +1,10 @@
-from fileformats.base import BaseFile
+from fileformats.base import HachoirParsable
 
 
-class MOVFile(BaseFile):
+class MOVFile(HachoirParsable):
 
     def __init__(self, path):
-        super(MOVFile, self).__init__()
-        from hachoir_parser import createParser
-        self.parser = createParser(unicode(path))
-        if not self.parser:
-            raise Exception("Could not parse: %s" % path)
-
+        super(MOVFile, self).__init__(path)
         self._new_date = None
         self._creation_date_path, self._date_paths = self._find_date_paths()
 
@@ -50,6 +45,7 @@ class MOVFile(BaseFile):
         movie = self._find_atom_by_field(self.parser, 'movie')[0]
         movie_hdr = self._find_atom_by_field(movie, 'movie_hdr')[0]
         creation_date_path = movie_hdr['creation_date'].path
+
         paths.append(creation_date_path)
         paths.append(movie_hdr['lastmod_date'].path)
 
@@ -65,6 +61,3 @@ class MOVFile(BaseFile):
             paths.append(media_hdr['lastmod_date'].path)
 
         return creation_date_path, paths
-
-    def close(self):
-        self.parser.stream._input.close()

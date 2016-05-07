@@ -1,9 +1,9 @@
-from fileformats.base import BaseFile
+from fileformats.base import HachoirParsable
 
 from datetime import datetime
 
 
-class JPEGFile(BaseFile):
+class JPEGFile(HachoirParsable):
     DATE_FORMAT = '%Y:%m:%d %H:%M:%S'
 
     # From hachoir_parser/image/exif.py
@@ -16,12 +16,7 @@ class JPEGFile(BaseFile):
     }
 
     def __init__(self, path):
-        super(JPEGFile, self).__init__()
-        from hachoir_parser import createParser
-        self.parser = createParser(unicode(path))
-        if not self.parser:
-            raise Exception("Could not parse: %s" % path)
-
+        super(JPEGFile, self).__init__(path)
         self._new_date = None
         self._metadata_paths = {}
 
@@ -68,6 +63,3 @@ class JPEGFile(BaseFile):
         from hachoir_core.stream import FileOutputStream
         output = FileOutputStream(path)
         editor.writeInto(output)
-
-    def close(self):
-        self.parser.stream._input.close()

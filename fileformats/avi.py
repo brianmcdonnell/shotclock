@@ -1,18 +1,13 @@
-from fileformats.base import BaseFile
+from fileformats.base import HachoirParsable
 
 from datetime import datetime
 
 
-class AVIFile(BaseFile):
+class AVIFile(HachoirParsable):
     DATE_FORMAT = '%a %b %d %H:%M:%S %Y\n'
 
     def __init__(self, path):
-        super(AVIFile, self).__init__()
-        from hachoir_parser import createParser
-        self.parser = createParser(unicode(path))
-        if not self.parser:
-            raise Exception("Could not parse: %s" % path)
-
+        super(AVIFile, self).__init__(path)
         self._date_path = '/headers/datetime/text'
         self._new_date = None
 
@@ -41,6 +36,3 @@ class AVIFile(BaseFile):
         from hachoir_core.stream import FileOutputStream
         output = FileOutputStream(path)
         editor.writeInto(output)
-
-    def close(self):
-        self.parser.stream._input.close()

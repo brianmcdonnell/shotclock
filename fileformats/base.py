@@ -1,13 +1,14 @@
-class BaseFile(object):
+class HachoirParsable(object):
 
-    def get_date(self):
-        pass
+    def __init__(self, path):
+        super(HachoirParsable, self).__init__()
+        from hachoir_parser import createParser
+        self.parser = createParser(unicode(path))
+        if not self.parser:
+            raise Exception("Could not parse: %s" % path)
 
-    def set_date(self, date):
-        pass
+    def __enter__(self):
+        return self.parser
 
-    def close(self):
-        pass
-
-    def save_as(self, path):
-        pass
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.parser.stream._input.close()
