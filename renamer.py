@@ -14,10 +14,10 @@ class Renamer(object):
         if suffix:
             self.filename_format += ' ' + suffix
 
-    def process_file(self, input_path, fmtKlass, output_dir):
+    def process_file(self, input_path, fmt_klass, output_dir):
         # Get the creation date from the working copy
-        with fmtKlass(input_path) as fileFmt:
-            creation_dt = fileFmt.get_date()
+        with fmt_klass(input_path) as file_fmt:
+            creation_dt = file_fmt.get_date()
 
         # Format the output path
         _, input_filename = os.path.split(input_path)
@@ -28,7 +28,7 @@ class Renamer(object):
         output_path = os.path.join(output_dir, output_filename)
 
         # Rename the working copy to the new filename
-        # shutil.copy2(input_path, output_path)
+        shutil.copy2(input_path, output_path)
         print '%s -> %s' % (input_path, output_path)
 
     def _get_output_filename(self, input_filename, dt):
