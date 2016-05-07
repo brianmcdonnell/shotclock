@@ -21,8 +21,8 @@ class TimeShifter(object):
             filefmt.set_date(shifted_dt)
             filefmt.save_as(unicode(output_path))
 
-        print "%s: %s -> %s (h:%s m:%s)" % \
-            (input_filename, dt, shifted_dt, self.hours, self.minutes)
+            print "%s: %s -> %s (h:%s m:%s)" % \
+                (input_filename, dt, shifted_dt, self.hours, self.minutes)
 
     def _shift_time(self, input_time):
         td = datetime.timedelta(hours=self.hours, minutes=self.minutes)
