@@ -15,7 +15,7 @@ def process_file(path, command, output_dir):
         from fileformats import jpeg, mov, avi
         if ext in ['jpg', 'jpeg']:
             fmtKlass = jpeg.JPEGFile
-        elif ext == 'mov':
+        elif ext in ['mov', 'mp4']:
             fmtKlass = mov.MOVFile
         elif ext == 'avi':
             fmtKlass = avi.AVIFile
@@ -25,7 +25,6 @@ def process_file(path, command, output_dir):
         command.process_file(path, fmtKlass, output_dir)
     except Exception:
         print "Skipping %s" % path
-        raise
 
 
 def process_expanded_arg(arg, command, output_dir):
