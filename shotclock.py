@@ -38,7 +38,7 @@ if __name__ == '__main__':
         from commands.timeshift import TimeShiftCommand
         command = TimeShiftCommand(args.hours, args.minutes)
     elif args.subparser == 'rename':
-        from renamer import RenameCommand
+        from rename import RenameCommand
         command = RenameCommand(not args.exclude_original_name, args.suffix)
     else:
         raise Exception("Unknown command")
