@@ -2,20 +2,24 @@ import os
 import os.path
 import shutil
 
+from filecommand import FileCommand
 
-class Renamer(object):
+
+class Renamer(FileCommand):
     date_format = '%Y-%m-%d %H-%M-%S'
     date_compact_format = '%Y%m%d_%H%M%S'
 
     def __init__(self, include_filename=True, suffix=None):
+        super(Renamer, self).__init__()
         self.filename_format = '%(date)s'
         if include_filename:
             self.filename_format += ' %(filename)s'
         if suffix:
             self.filename_format += ' ' + suffix
 
-    def process_file(self, input_path, fmt_klass, output_dir):
+    def process_file(self, input_path, output_dir):
         # Get the creation date from the working copy
+        fmt_klass = self._get_metadata_handler(input_path)
         with fmt_klass(input_path) as file_fmt:
             creation_dt = file_fmt.get_date()
 

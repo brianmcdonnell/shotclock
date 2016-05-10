@@ -2,15 +2,19 @@ import os
 import os.path
 import datetime
 
+from filecommand import FileCommand
 
-class TimeShifter(object):
+
+class TimeShifter(FileCommand):
 
     def __init__(self, hours=0, minutes=0):
+        super(TimeShifter, self).__init__()
         self.hours = hours
         self.minutes = minutes
 
-    def process_file(self, input_path, fmt_klass, output_dir):
+    def process_file(self, input_path, output_dir):
         # Get the creation date and shift it
+        fmt_klass = self._get_metadata_handler(input_path)
         with fmt_klass(input_path) as file_fmt:
             dt = file_fmt.get_date()
             shifted_dt = self._shift_time(dt)
