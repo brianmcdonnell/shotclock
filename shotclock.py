@@ -19,8 +19,7 @@ if __name__ == '__main__':
     timeshift_parser.add_argument('glob', nargs='+',
                                   help='Globs of files to process.')
 
-    from renamer import Renamer
-    renamer_parser = subparsers.add_parser('renamer',
+    renamer_parser = subparsers.add_parser('rename',
                                            help='Rename matching files to \
                                            their timestamp values.')
     renamer_parser.add_argument('--suffix', '-s', dest='suffix', default=None)
@@ -33,13 +32,14 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     if args.subparser == 'comparedirs':
-        from comparedirs import CompareDirs
-        command = CompareDirs(args.dir1, args.dir2)
+        from commands.comparedirs import CompareDirsCommand
+        command = CompareDirsCommand(args.dir1, args.dir2)
     elif args.subparser == 'timeshift':
-        from timeshifter import TimeShifter
-        command = TimeShifter(args.hours, args.minutes)
-    elif args.subparser == 'renamer':
-        command = Renamer(not args.exclude_original_name, args.suffix)
+        from commands.timeshift import TimeShiftCommand
+        command = TimeShiftCommand(args.hours, args.minutes)
+    elif args.subparser == 'rename':
+        from renamer import RenameCommand
+        command = RenameCommand(not args.exclude_original_name, args.suffix)
     else:
         raise Exception("Unknown command")
 
