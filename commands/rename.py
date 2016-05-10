@@ -5,12 +5,12 @@ import shutil
 from filecommand import FileCommand
 
 
-class Renamer(FileCommand):
+class RenameCommand(FileCommand):
     date_format = '%Y-%m-%d %H-%M-%S'
     date_compact_format = '%Y%m%d_%H%M%S'
 
     def __init__(self, include_filename=True, suffix=None):
-        super(Renamer, self).__init__()
+        super(RenameCommand, self).__init__()
         self.filename_format = '%(date)s'
         if include_filename:
             self.filename_format += ' %(filename)s'
@@ -39,8 +39,8 @@ class Renamer(FileCommand):
         dir_path, filename = os.path.split(input_filename)
         filename_trunc, filext = os.path.splitext(filename)
         # Format dates
-        date_str = dt.strftime(Renamer.date_format)
-        date_compact_str = dt.strftime(Renamer.date_compact_format)
+        date_str = dt.strftime(RenameCommand.date_format)
+        date_compact_str = dt.strftime(RenameCommand.date_compact_format)
         # Populate templated format
         template_vars = {'date': date_str,
                          'date_compact': date_compact_str,

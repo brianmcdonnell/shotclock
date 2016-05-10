@@ -5,10 +5,10 @@ import datetime
 from filecommand import FileCommand
 
 
-class TimeShifter(FileCommand):
+class TimeShiftCommand(FileCommand):
 
     def __init__(self, hours=0, minutes=0):
-        super(TimeShifter, self).__init__()
+        super(TimeShiftCommand, self).__init__()
         self.hours = hours
         self.minutes = minutes
 
