@@ -19,15 +19,20 @@ if __name__ == '__main__':
     timeshift_parser.add_argument('glob', nargs='+',
                                   help='Globs of files to process.')
 
-    renamer_parser = subparsers.add_parser('rename',
-                                           help='Rename matching files to \
-                                           their timestamp values.')
-    renamer_parser.add_argument('--suffix', '-s', dest='suffix', default=None)
-    renamer_parser.add_argument('glob', nargs='+',
-                                help='Globs of files to process.')
-    renamer_parser.add_argument('--exclude-original-name', '-e',
-                                dest='exclude_original_name',
-                                action='store_true', default=False)
+    rename_parser = subparsers.add_parser('rename',
+                                          help='Rename matching files to \
+                                          their timestamp values.')
+    rename_parser.add_argument('--suffix', '-s', dest='suffix', default=None)
+    rename_parser.add_argument('glob', nargs='+',
+                               help='Globs of files to process.')
+    rename_parser.add_argument('--exclude-original-name', '-e',
+                               dest='exclude_original_name',
+                               action='store_true', default=False)
+
+    organize_parser = subparsers.add_argument('organize',
+                                              help="Organize files into \
+                                              directories.")
+    organize_parser.add_argument('--config', '-s', dest='config', default=None)
 
     args = parser.parse_args()
 
