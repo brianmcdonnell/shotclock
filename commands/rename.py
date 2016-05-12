@@ -7,7 +7,6 @@ from filecommand import FileCommand
 
 class RenameCommand(FileCommand):
     date_format = '%Y-%m-%d %H-%M-%S'
-    date_compact_format = '%Y%m%d_%H%M%S'
 
     def __init__(self, include_filename=True, suffix=None):
         super(RenameCommand, self).__init__()
