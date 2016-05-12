@@ -29,16 +29,21 @@ if __name__ == '__main__':
                                dest='exclude_original_name',
                                action='store_true', default=False)
 
-    organize_parser = subparsers.add_argument('organize',
-                                              help="Organize files into \
-                                              directories.")
+    organize_parser = subparsers.add_parser('organize',
+                                            help="Organize files into \
+                                            directories.")
     organize_parser.add_argument('--config', '-s', dest='config', default=None)
+    organize_parser.add_argument('glob', nargs='+',
+                                 help='Globs of files to process.')
 
     args = parser.parse_args()
 
     if args.subparser == 'comparedirs':
         from commands.comparedirs import CompareDirsCommand
         command = CompareDirsCommand(args.dir1, args.dir2)
+    if args.subparser == 'organize':
+        from commands.organize import OrganizeCommand
+        command = OrganizeCommand(args.config)
     elif args.subparser == 'timeshift':
         from commands.timeshift import TimeShiftCommand
         command = TimeShiftCommand(args.hours, args.minutes)
