@@ -39,10 +39,8 @@ class RenameCommand(FileCommand):
         filename_trunc, filext = os.path.splitext(filename)
         # Format dates
         date_str = dt.strftime(RenameCommand.date_format)
-        date_compact_str = dt.strftime(RenameCommand.date_compact_format)
         # Populate templated format
         template_vars = {'date': date_str,
-                         'date_compact': date_compact_str,
                          'filename': filename_trunc}
         new_filename = self.filename_format % template_vars
         new_filename += filext
