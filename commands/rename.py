@@ -20,7 +20,7 @@ class RenameCommand(FileCommand):
         # Get the creation date from the working copy
         fmt_klass = self._get_metadata_handler(input_path)
         with fmt_klass(input_path) as file_fmt:
-            creation_dt = file_fmt.get_date()
+            creation_dt = file_fmt.creation_date
 
         # Format the output path
         _, input_filename = os.path.split(input_path)

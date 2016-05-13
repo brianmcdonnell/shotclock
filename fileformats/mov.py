@@ -8,12 +8,14 @@ class MOVFile(HachoirParsable):
         self._new_date = None
         self._creation_date_path, self._date_paths = self._find_date_paths()
 
-    def get_date(self):
+    @property
+    def creation_date(self):
         creation_date = self.parser[self._creation_date_path].value
         return creation_date
 
-    def set_date(self, date):
-        self._new_date = date
+    @creation_date.setter
+    def creation_date(self, value):
+        self._new_date = value
 
     def save_as(self, path):
         from hachoir_editor import createEditor

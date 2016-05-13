@@ -41,14 +41,16 @@ class JPEGFile(HachoirParsable):
             value_node = ifd["value_%s" % entry.name]
         self._metadata_paths[key] = value_node.path
 
-    def get_date(self):
+    @property
+    def creation_date(self):
         exif_path = self._metadata_paths['creation_datetime']
         creation_date = datetime.strptime(self.parser[exif_path].value,
                                           JPEGFile.DATE_FORMAT)
         return creation_date
 
-    def set_date(self, date):
-        self._new_date = date
+    @creation_date.setter
+    def creation_date(self, value):
+        self._new_date = value
 
     def save_as(self, path):
         from hachoir_editor import createEditor

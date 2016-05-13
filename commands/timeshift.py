@@ -16,13 +16,13 @@ class TimeShiftCommand(FileCommand):
         # Get the creation date and shift it
         fmt_klass = self._get_metadata_handler(input_path)
         with fmt_klass(input_path) as file_fmt:
-            dt = file_fmt.get_date()
+            dt = file_fmt.creation_date
             shifted_dt = self._shift_time(dt)
 
             # Update the metadata and persist to output path
             _, input_filename = os.path.split(input_path)
             output_path = os.path.join(output_dir, input_filename)
-            file_fmt.set_date(shifted_dt)
+            file_fmt.creation_date = shifted_dt
             file_fmt.save_as(unicode(output_path))
 
             print "%s: %s -> %s (h:%s m:%s)" % \

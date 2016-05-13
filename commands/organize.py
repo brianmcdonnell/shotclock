@@ -55,7 +55,7 @@ class OrganizeCommand(FileCommand):
     def process_file(self, input_path, output_dir):
         fmt_klass = self._get_metadata_handler(input_path)
         with fmt_klass(input_path) as file_fmt:
-            creation_date = file_fmt.get_date()
+            creation_date = file_fmt.creation_date
         rule = self._get_matching_rule(creation_date)
         if rule:
             org_format = rule.format % {'default': self._default_format}
