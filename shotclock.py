@@ -36,6 +36,11 @@ if __name__ == '__main__':
     organize_parser.add_argument('glob', nargs='+',
                                  help='Globs of files to process.')
 
+    dedupe_parser = subparsers.add_parser('dedupe',
+                                          help="Identify duplicates for \
+                                          review.")
+    dedupe_parser.add_argument('--dir', dest='dir', default='dir')
+
     args = parser.parse_args()
 
     if args.subparser == 'comparedirs':
@@ -50,6 +55,9 @@ if __name__ == '__main__':
     elif args.subparser == 'rename':
         from commands.rename import RenameCommand
         command = RenameCommand(not args.exclude_original_name, args.suffix)
+    elif args.subparser == 'dedupe':
+        from commands.dedupe import DeDupeCommand
+        command = DeDupeCommand(args.dir)
     else:
         raise Exception("Unknown command")
 
