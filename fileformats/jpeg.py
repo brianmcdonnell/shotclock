@@ -26,6 +26,9 @@ class JPEGFile(HachoirParsable):
                 for entry in ifd.array("entry"):
                     self._processIfdEntry(ifd, entry)
 
+    def __hash__(self):
+        pass
+
     def _processIfdEntry(self, ifd, entry):
         tag = entry["tag"].value
         if tag not in JPEGFile.EXIF_TAG_CODES:
