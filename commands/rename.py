@@ -3,7 +3,7 @@ import os.path
 import shutil
 
 from filecommand import FileCommand
-
+from fileformats import get_metadata_handler
 
 class RenameCommand(FileCommand):
     date_format = '%Y-%m-%d %H-%M-%S'
@@ -18,7 +18,7 @@ class RenameCommand(FileCommand):
 
     def process_file(self, input_path, output_dir):
         # Get the creation date from the working copy
-        fmt_klass = self._get_metadata_handler(input_path)
+        fmt_klass = get_metadata_handler(input_path)
         with fmt_klass(input_path) as file_fmt:
             creation_dt = file_fmt.creation_date
 

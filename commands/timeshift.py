@@ -3,6 +3,7 @@ import os.path
 import datetime
 
 from filecommand import FileCommand
+from fileformats import get_metadata_handler
 
 
 class TimeShiftCommand(FileCommand):
@@ -14,7 +15,7 @@ class TimeShiftCommand(FileCommand):
 
     def process_file(self, input_path, output_dir):
         # Get the creation date and shift it
-        fmt_klass = self._get_metadata_handler(input_path)
+        fmt_klass = get_metadata_handler(input_path)
         with fmt_klass(input_path) as file_fmt:
             dt = file_fmt.creation_date
             shifted_dt = self._shift_time(dt)

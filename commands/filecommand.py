@@ -1,5 +1,5 @@
 import os
-
+from fileformats import get_metadata_handler
 
 class FileCommand(object):
 
@@ -43,18 +43,3 @@ class FileCommand(object):
         except Exception as e:
             print "Skipping %s" % path, e
             raise
-
-    def _get_metadata_handler(self, path):
-        base, ext = os.path.splitext(path)
-        ext = ext[1:].lower()
-
-        from fileformats import jpeg, mov, avi
-        if ext in ['jpg', 'jpeg']:
-            fmtKlass = jpeg.JPEGFile
-        elif ext in ['mov', 'mp4']:
-            fmtKlass = mov.MOVFile
-        elif ext == 'avi':
-            fmtKlass = avi.AVIFile
-        else:
-            raise Exception("Unknown file extension: %s" % ext)
-        return fmtKlass

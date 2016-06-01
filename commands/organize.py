@@ -1,10 +1,10 @@
 import os
 import os.path
-import errno
 from collections import namedtuple
 from datetime import datetime
 
 from filecommand import FileCommand
+from fileformats import get_metadata_handler
 
 
 Rule = namedtuple('Rule', ['after_date', 'before_date', 'format'])
@@ -53,7 +53,7 @@ class OrganizeCommand(FileCommand):
         return rules
 
     def process_file(self, input_path, output_dir):
-        fmt_klass = self._get_metadata_handler(input_path)
+        fmt_klass = get_metadata_handler(input_path)
         with fmt_klass(input_path) as file_fmt:
             creation_date = file_fmt.creation_date
         rule = self._get_matching_rule(creation_date)
@@ -70,6 +70,7 @@ class OrganizeCommand(FileCommand):
 
         _, filename = os.path.split(input_path)
         output_dir = os.path.join(output_dir, org_dir)
+        from shotclock import mkdir_p
         mkdir_p(output_dir)
         output_path = os.path.join(output_dir, filename)
 
@@ -84,13 +85,3 @@ class OrganizeCommand(FileCommand):
                     file_date < rule.before_date:
                 return rule
         return None
-
-
-def mkdir_p(path):
-    try:
-        os.makedirs(path)
-    except OSError as exc:
-        if exc.errno == errno.EEXIST and os.path.isdir(path):
-            pass
-        else:
-            raise
