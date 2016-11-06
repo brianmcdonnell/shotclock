@@ -5,12 +5,12 @@ import shutil
 
 class CompareDirsCommand(object):
 
-    def __init__(self, dir1, dir2):
+    def __init__(self, args):
         super(CompareDirsCommand, self).__init__()
-        self._dir1 = dir1
-        self._dir2 = dir2
+        self._dir1 = args.dir1
+        self._dir2 = args.dir2
 
-    def execute(self, dir1, dir2):
+    def execute(self):
         pass
 
 

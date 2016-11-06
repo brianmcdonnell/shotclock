@@ -8,10 +8,10 @@ from fileformats import get_metadata_handler
 
 class TimeShiftCommand(FileCommand):
 
-    def __init__(self, hours=0, minutes=0):
+    def __init__(self, args):
         super(TimeShiftCommand, self).__init__()
-        self.hours = hours
-        self.minutes = minutes
+        self.hours = args.hours
+        self.minutes = args.minutes
 
     def process_file(self, input_path, output_dir):
         # Get the creation date and shift it

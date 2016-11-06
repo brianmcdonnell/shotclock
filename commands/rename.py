@@ -5,11 +5,14 @@ import shutil
 from filecommand import FileCommand
 from fileformats import get_metadata_handler
 
+
 class RenameCommand(FileCommand):
     date_format = '%Y-%m-%d %H-%M-%S'
 
-    def __init__(self, include_filename=True, suffix=None):
+    def __init__(self, args):
         super(RenameCommand, self).__init__()
+        include_filename = not args.exclude_original_name
+        suffix = args.suffix
         self.filename_format = '%(date)s'
         if include_filename:
             self.filename_format += ' %(filename)s'

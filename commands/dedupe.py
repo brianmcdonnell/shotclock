@@ -12,10 +12,11 @@ File = namedtuple('File', ['filename', 'byte_size', 'creation_date'])
 
 class DeDupeCommand(object):
 
-    def __init__(self, dir, hours, mins):
+    def __init__(self, args):
         super(DeDupeCommand, self).__init__()
-        self._dir = dir
-        self._tolerance = timedelta(hours=hours, minutes=mins).total_seconds()
+        self._dir = args.dir
+        td = timedelta(hours=args.hours, minutes=args.mins)
+        self._tolerance = td.total_seconds()
         self._tolerance = abs(self._tolerance)
         print "TOLERANCE (secs)", self._tolerance
 

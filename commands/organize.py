@@ -14,8 +14,9 @@ class OrganizeCommand(FileCommand):
 
     DATE_FORMATS = ['%Y-%m-%d', '%Y-%m-%d %H:%M:%S']
 
-    def __init__(self, config_path):
+    def __init__(self, args):
         super(OrganizeCommand, self).__init__()
+        config_path = args.config
         import json
         with open(config_path, 'r') as f:
             self._config = json.loads(f.read())

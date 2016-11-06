@@ -63,19 +63,19 @@ if __name__ == '__main__':
 
     if args.subparser == 'comparedirs':
         from commands.comparedirs import CompareDirsCommand
-        command = CompareDirsCommand(args.dir1, args.dir2)
+        command = CompareDirsCommand(args)
     if args.subparser == 'organize':
         from commands.organize import OrganizeCommand
-        command = OrganizeCommand(args.config)
+        command = OrganizeCommand(args)
     elif args.subparser == 'timeshift':
         from commands.timeshift import TimeShiftCommand
-        command = TimeShiftCommand(args.hours, args.minutes)
+        command = TimeShiftCommand(args)
     elif args.subparser == 'rename':
         from commands.rename import RenameCommand
-        command = RenameCommand(not args.exclude_original_name, args.suffix)
+        command = RenameCommand(args)
     elif args.subparser == 'dedupe':
         from commands.dedupe import DeDupeCommand
-        command = DeDupeCommand(args.dir, args.hours, args.minutes)
+        command = DeDupeCommand(args)
     else:
         raise Exception("Unknown command")
 
