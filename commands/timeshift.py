@@ -7,6 +7,18 @@ from fileformats import get_metadata_handler
 
 
 class TimeShiftCommand(FileCommand):
+    name = "timeshift"
+
+    @classmethod
+    def add_parse_args(cls, subparsers):
+        parser = subparsers.add_parser(cls.name,
+                                       help='Timeshift matching files \
+                                       by the specified amount.')
+        parser.add_argument('--hours', type=int, dest='hours', default=0)
+        parser.add_argument('--minutes', '-m',
+                            type=int, dest='minutes', default=0)
+        parser.add_argument('glob', nargs='+',
+                            help='Globs of files to process.')
 
     def __init__(self, args):
         super(TimeShiftCommand, self).__init__()

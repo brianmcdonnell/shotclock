@@ -8,6 +8,20 @@ from fileformats import get_metadata_handler
 
 class RenameCommand(FileCommand):
     date_format = '%Y-%m-%d %H-%M-%S'
+    name = "rename"
+
+    @classmethod
+    def add_parse_args(cls, subparsers):
+        parser = subparsers.add_parser(cls.name,
+                                       help='Rename matching files to \
+                                        their timestamp values.')
+        parser.add_argument('--suffix', '-s', dest='suffix', default=None)
+        parser.add_argument('glob', nargs='+',
+                            help='Globs of files to process.')
+
+        parser.add_argument('--exclude-original-name', '-e',
+                            dest='exclude_original_name',
+                            action='store_true', default=False)
 
     def __init__(self, args):
         super(RenameCommand, self).__init__()

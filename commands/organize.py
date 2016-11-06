@@ -11,8 +11,17 @@ Rule = namedtuple('Rule', ['after_date', 'before_date', 'format'])
 
 
 class OrganizeCommand(FileCommand):
+    name = "organize"
+    date_formats = ['%Y-%m-%d', '%Y-%m-%d %H:%M:%S']
 
-    DATE_FORMATS = ['%Y-%m-%d', '%Y-%m-%d %H:%M:%S']
+    @classmethod
+    def add_parse_args(cls, subparsers):
+        parser = subparsers.add_parser(cls.name,
+                                       help="Organize files into \
+                                       directories.")
+        parser.add_argument('--config', '-s', dest='config', default=None)
+        parser.add_argument('glob', nargs='+',
+                            help='Globs of files to process.')
 
     def __init__(self, args):
         super(OrganizeCommand, self).__init__()
@@ -26,14 +35,14 @@ class OrganizeCommand(FileCommand):
     def _load_rules(self):
         def parse_date(str):
             dt = None
-            for fmt in OrganizeCommand.DATE_FORMATS:
+            for fmt in OrganizeCommand.date_formats:
                 try:
                     dt = datetime.strptime(str, fmt)
                 except:
                     pass
             if dt is None:
                 raise ValueError("Invalid date '%s'. Valid formats: %s"
-                                 % (str, OrganizeCommand.DATE_FORMATS))
+                                 % (str, OrganizeCommand.date_formats))
             return dt
 
         rules = []

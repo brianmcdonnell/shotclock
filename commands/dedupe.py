@@ -11,6 +11,17 @@ File = namedtuple('File', ['filename', 'byte_size', 'creation_date'])
 
 
 class DeDupeCommand(object):
+    name = "dedupe"
+
+    @classmethod
+    def add_parse_args(cls, subparsers):
+        parser = subparsers.add_parser(cls.name,
+                                       help="Identify duplicates for \
+                                       review.")
+        parser.add_argument('--dir', dest='dir')
+        parser.add_argument('--hours', type=int, dest='hours', default=0)
+        parser.add_argument('--minutes', '-m',
+                            type=int, dest='minutes', default=0)
 
     def __init__(self, args):
         super(DeDupeCommand, self).__init__()
