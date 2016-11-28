@@ -6,11 +6,9 @@ import errno
 from hachoir_core import config as HachoirConfig
 HachoirConfig.quiet = True
 
-from commands.comparedirs import CompareDirsCommand
 from commands.organize import OrganizeCommand
 from commands.timeshift import TimeShiftCommand
 from commands.rename import RenameCommand
-from commands.dedupe import DeDupeCommand
 
 
 def mkdir_p(path):
@@ -31,9 +29,8 @@ if __name__ == '__main__':
 
     command_list = [TimeShiftCommand,
                     RenameCommand,
-                    OrganizeCommand,
-                    CompareDirsCommand,
-                    DeDupeCommand]
+                    OrganizeCommand]
+
     command_map = {}
     for klass in command_list:
         command_map[klass.name] = klass
