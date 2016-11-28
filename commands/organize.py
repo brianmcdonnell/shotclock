@@ -2,6 +2,7 @@ import os
 import os.path
 from collections import namedtuple
 from datetime import datetime
+import json
 
 from filecommand import FileCommand
 from fileformats import get_metadata_handler
@@ -13,42 +14,33 @@ Rule = namedtuple('Rule', ['after_date', 'before_date', 'format'])
 class OrganizeCommand(FileCommand):
     name = "organize"
     date_formats = ['%Y-%m-%d', '%Y-%m-%d %H:%M:%S']
+    org_format = "%(Y)s/%(m)s - %(B)s"
 
     @classmethod
     def add_parse_args(cls, subparsers):
         parser = subparsers.add_parser(cls.name,
-                                       help="Organize files into \
-                                       directories.")
+                                       help="Organize files into directories.")
         parser.add_argument('--config', '-s', dest='config', default=None)
-        parser.add_argument('glob', nargs='+',
-                            help='Globs of files to process.')
+        parser.add_argument('glob', nargs='+', help='Globs to process.')
 
     def __init__(self, args):
         super(OrganizeCommand, self).__init__()
-        config_path = args.config
-        import json
-        with open(config_path, 'r') as f:
-            self._config = json.loads(f.read())
-        self._default_format = self._config['format']
-        self._rules = self._load_rules()
+        self._default_format = OrganizeCommand.org_format
+        self._rules = []
 
-    def _load_rules(self):
-        def parse_date(str):
-            dt = None
-            for fmt in OrganizeCommand.date_formats:
-                try:
-                    dt = datetime.strptime(str, fmt)
-                except:
-                    pass
-            if dt is None:
-                raise ValueError("Invalid date '%s'. Valid formats: %s"
-                                 % (str, OrganizeCommand.date_formats))
-            return dt
+        if args.config:
+            with open(args.config, 'r') as f:
+                config = json.loads(f.read())
+            if 'format' in config:
+                self._default_format = config['format']
+            if 'rules' in config:
+                self._rules = self._load_rules(config['rules'])
 
+    def _load_rules(config_rules):
         rules = []
-        for r in self._config['rules']:
-            after_date = parse_date(r['after_date'])
-            before_date = parse_date(r['before_date'])
+        for r in config_rules:
+            after_date = _parse_date(r['after_date'])
+            before_date = _parse_date(r['before_date'])
             rule = Rule(after_date=after_date, before_date=before_date,
                         format=r['format'])
             # print rule.after_date, rule.before_date
@@ -85,7 +77,7 @@ class OrganizeCommand(FileCommand):
         output_path = os.path.join(output_dir, filename)
 
         import shutil
-        shutil.copy2(input_path, output_path)
+        # shutil.copy2(input_path, output_path)
         print '%s -> %s' % (input_path, output_path)
 
     def _get_matching_rule(self, file_date):
@@ -95,3 +87,16 @@ class OrganizeCommand(FileCommand):
                     file_date < rule.before_date:
                 return rule
         return None
+
+
+def _parse_date(str):
+        dt = None
+        for fmt in OrganizeCommand.date_formats:
+            try:
+                dt = datetime.strptime(str, fmt)
+            except:
+                pass
+        if dt is None:
+            raise ValueError("Invalid date '%s'. Valid formats: %s" %
+                             (str, OrganizeCommand.date_formats))
+        return dt
