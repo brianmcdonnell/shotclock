@@ -1,6 +1,6 @@
-from fileformats.base import HachoirParsable
-
 from datetime import datetime
+
+from fileformats.base import HachoirParsable
 
 
 class JPEGFile(HachoirParsable):
@@ -11,22 +11,22 @@ class JPEGFile(HachoirParsable):
         0x010f: "camera_manufacturer",
         0x0110: "camera_model",
         0x0132: "creation_datetime",
+        0x0202: "jpeg_bytes",
         0x9003: "original_datetime",
         0x9004: "digitized_datetime",
-        0xA420: "unique_image_id",
-        0x0202: "jpeg_bytes",
         0x9201: "shutter_speed",
         0x9202: "aperture",
         0x9203: "brightness",
         0x920A: "focal_length1",
+        0xA420: "unique_image_id",
         0xA405: "focal_length2",
     }
 
     def __init__(self, path):
         super(JPEGFile, self).__init__(path)
-        self._new_date = None
-        self._metadata_paths = {}
+        self._register_fields()
 
+    def _register_fields(self):
         # Search ifd fields for metadata
         if "exif/content" in self.parser:
             for ifd in self.parser.array("exif/content/ifd"):
@@ -38,47 +38,20 @@ class JPEGFile(HachoirParsable):
         if tag not in JPEGFile.EXIF_TAG_CODES:
             return
 
-        key = JPEGFile.EXIF_TAG_CODES[tag]
+        name = JPEGFile.EXIF_TAG_CODES[tag]
         if "value" in entry:
             value_node = entry["value"]
         else:
             value_node = ifd["value_%s" % entry.name]
-        self._metadata_paths[key] = value_node.path
-
-    @property
-    def image_unique_id(self):
-        exif_path = self._metadata_paths['unique_image_id']
-        return self.parser[exif_path].value
-
-    @property
-    def brightness(self):
-        exif_path = self._metadata_paths['brightness']
-        return self.parser[exif_path].value
+        self.register_field(name, value_node.path)
 
     @property
     def creation_date(self):
-        exif_path = self._metadata_paths['creation_datetime']
-        creation_date = datetime.strptime(self.parser[exif_path].value,
-                                          JPEGFile.DATE_FORMAT)
-        return creation_date
+        date_str = self.parser[self.get_path('creation_datetime')].value
+        return datetime.strptime(date_str, JPEGFile.DATE_FORMAT)
 
     @creation_date.setter
     def creation_date(self, value):
-        self._new_date = value
-
-    def save_as(self, path):
-        from hachoir_editor import createEditor
-        editor = createEditor(self.parser)
-
-        if self._new_date is not None:
-            new_date_str = self._new_date.strftime(JPEGFile.DATE_FORMAT) + '\0'
-            for key in ('creation_datetime',
-                        'original_datetime',
-                        'digitized_datetime'):
-                exif_path = self._metadata_paths[key]
-                editor[exif_path].value = new_date_str
-
-        # Write out the file
-        from hachoir_core.stream import FileOutputStream
-        output = FileOutputStream(path)
-        editor.writeInto(output)
+        assert isinstance(value, datetime)
+        date_str = value.strftime(JPEGFile.DATE_FORMAT) + '\0'
+        self.set_field('creation_datetime', date_str)
