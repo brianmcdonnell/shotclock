@@ -1,3 +1,4 @@
 .ropeproject/
 env/
 output/
+tests/test-media/
