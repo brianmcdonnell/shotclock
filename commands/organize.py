@@ -2,7 +2,7 @@ import os
 import os.path
 from collections import namedtuple
 from datetime import datetime
-import json
+import csv
 
 from filecommand import FileCommand
 from fileformats import get_metadata_handler
@@ -10,11 +10,21 @@ from fileformats import get_metadata_handler
 
 Rule = namedtuple('Rule', ['after_date', 'before_date', 'format'])
 
+class Rule(object):
+    def __init__(self, path_format, date_range):
+        self.path_format = path_format
+        self.from_date = date_range[0]
+        self.to_date = date_range[1]
+
+    def is_match(self, file_date):
+        if self.from_date is None and self.to_date is None:
+            return True
+        return self.from_date <= file_date < self.to_date
+
 
 class OrganizeCommand(FileCommand):
     name = "organize"
-    date_formats = ['%Y-%m-%d', '%Y-%m-%d %H:%M:%S']
-    org_format = "%(Y)s/%(m)s - %(B)s"
+    date_formats = ['%Y-%m-%d', '%Y-%m-%d %H:%M', '%Y-%m-%d %H:%M:%S']
 
     @classmethod
     def add_parse_args(cls, subparsers):
@@ -25,53 +35,33 @@ class OrganizeCommand(FileCommand):
 
     def __init__(self, args):
         super(OrganizeCommand, self).__init__()
-        self._default_format = OrganizeCommand.org_format
         self._rules = []
 
         if args.config:
             with open(args.config, 'r') as f:
-                config = json.loads(f.read())
-            if 'format' in config:
-                self._default_format = config['format']
-            if 'rules' in config:
-                self._rules = self._load_rules(config['rules'])
+                csvreader = csv.DictReader(f)
+                for row in csvreader:
+                    path_format = row['path_format']
+                    from_date = _parse_date(row['from_date']) if row['from_date'] else None
+                    to_date = _parse_date(row['to_date']) if row['to_date'] else None
+                    self._rules.append(Rule(path_format, (from_date, to_date)))
 
-    def _load_rules(config_rules):
-        rules = []
-        for r in config_rules:
-            after_date = _parse_date(r['after_date'])
-            before_date = _parse_date(r['before_date'])
-            rule = Rule(after_date=after_date, before_date=before_date,
-                        format=r['format'])
-            # print rule.after_date, rule.before_date
-            rules.append(rule)
-
-        rules = sorted(rules,
-                       lambda r1, r2: r1.after_date < r2.after_date)
-        prev_rule = None
-        for rule in rules:
-            if prev_rule and rule.after_date < prev_rule.before_date:
-                raise ValueError("Rule dates may not overlap")
-        return rules
 
     def process_file(self, input_path, output_dir):
         fmt_klass = get_metadata_handler(input_path)
         with fmt_klass(input_path) as file_fmt:
             creation_date = file_fmt.creation_date
+
         rule = self._get_matching_rule(creation_date)
-        if rule:
-            org_format = rule.format % {'default': self._default_format}
-        else:
-            org_format = self._default_format
 
         metadata = {}
         directives = ('Y', 'm', 'B', 'H', 'M', 'S')
         for d in directives:
             metadata[d] = datetime.strftime(creation_date, '%' + d)
-        org_dir = org_format % metadata
+        target_path = rule.path_format % metadata
 
         _, filename = os.path.split(input_path)
-        output_dir = os.path.join(output_dir, org_dir)
+        output_dir = os.path.join(output_dir, target_path)
         from shotclock import mkdir_p
         mkdir_p(output_dir)
         output_path = os.path.join(output_dir, filename)
@@ -82,12 +72,9 @@ class OrganizeCommand(FileCommand):
 
     def _get_matching_rule(self, file_date):
         for rule in self._rules:
-            # print file_date, rule.after_date, rule.before_date
-            if file_date >= rule.after_date and \
-                    file_date < rule.before_date:
+            if rule.is_match(file_date):
                 return rule
-        return None
-
+        raise Exception('No matching rule & no default rule')
 
 def _parse_date(str):
         dt = None
